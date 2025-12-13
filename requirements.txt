@@ -8,5 +8,4 @@ runware
 google-genai
 werkzeug
 dotenv
-functools
 email-validator
