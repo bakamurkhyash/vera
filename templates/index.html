@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERA: The AI Virtual Try-On API</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* CSS Reset and Variables */
+        :root {
+            --dark: #0f0f1a;
+            --primary: #6e45e2; /* Purple */
+            --accent: #b06ab3; /* Pink/Magenta */
+            --text-light: #f0f0f5;
+            --text-muted: #b0b0c5;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- DATA FLOW BACKGROUND --- */
+        .data-flow-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            opacity: 0.15;
+            z-index: 1;
+            pointer-events: none;
+            /* Create a grid/dot pattern */
+            background-image: radial-gradient(var(--primary) 1px, transparent 1px),
+                              radial-gradient(var(--accent) 1px, transparent 1px);
+            background-size: 80px 80px, 80px 80px;
+            background-position: 0 0, 40px 40px;
+            animation: moveBackground 60s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            from {
+                background-position: 0 0, 40px 40px;
+            }
+            to {
+                background-position: 80px 80px, 120px 120px;
+            }
+        }
+        
+        /* Utility Classes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- HEADER/NAV --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: rgba(15, 15, 26, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(110, 69, 226, 0.2);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: var(--transition);
+            opacity: 0.8;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+            opacity: 1;
+        }
+
+        .cta-button {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: var(--text-light);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(110, 69, 226, 0.4);
+        }
+
+        .cta-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(110, 69, 226, 0.6);
+        }
+
+        .secondary-button {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .secondary-button:hover {
+            background: var(--primary);
+            color: var(--text-light);
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(30, 30, 50, 0.2) 0%, rgba(15, 15, 26, 1) 70%);
+            padding-top: 6rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* AGGRESSIVE FIX: Ensure H1 visibility if JS fails */
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            font-weight: 900;
+            line-height: 1.1;
+            /* Using important and visibility to override any potential lingering conflicting styles */
+            visibility: visible !important; 
+            opacity: 1 !important;
+        }
+        /* GSAP will override this initial state immediately, but ensures fallback visibility */
+
+
+        .hero h1 span {
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        /* --- SECTION HEADERS --- */
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header h2 span {
+            color: var(--primary);
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        /* --- FEATURES SECTION --- */
+        .features {
+            padding: 5rem 5%;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(30, 30, 46, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(110, 69, 226, 0.2);
+        }
+
+        .feature-card i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            background: rgba(110, 69, 226, 0.1);
+            padding: 15px;
+            border-radius: 50%;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        /* --- HOW IT WORKS SECTION --- */
+        .how-it-works {
+            padding: 5rem 5%;
+            position: relative;
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 4rem auto 0;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        /* Connecting Line */
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            right: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        .step-card {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+            z-index: 1;
+            position: relative;
+            background-color: var(--dark);
+        }
+
+        .step-number {
+            width: 100px;
+            height: 100px;
+            background: var(--dark);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0 auto 2rem;
+            box-shadow: 0 0 20px rgba(110, 69, 226, 0.4);
+            color: white;
+            transition: var(--transition);
+        }
+
+        .step-card:hover .step-number {
+            transform: scale(1.1) rotate(10deg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .step-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-card p {
+            color: #b0b0c5;
+            padding: 0 1rem;
+        }
+
+        /* --- GALLERY SECTION --- */
+        .gallery {
+            padding: 5rem 5%;
+            background-color: #151525;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .gallery-item {
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* --- API & PRICING SECTION --- */
+        .api-pricing {
+            padding: 5rem 5%;
+        }
+
+        .api-card {
+            max-width: 800px;
+            margin: 4rem auto;
+            background: rgba(30, 30, 46, 0.7);
+            border: 2px solid var(--primary);
+            border-radius: 24px;
+            padding: 4rem 3rem;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 50px rgba(110, 69, 226, 0.3);
+            transition: var(--transition);
+        }
+        
+        .api-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .api-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .price-model {
+            margin: 2rem 0;
+        }
+
+        .cost {
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--accent);
+            display: block;
+            text-shadow: 0 0 15px var(--accent);
+            line-height: 1;
+        }
+
+        .unit {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #b0b0c5;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .subtext {
+            color: #aaa;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .api-features-list {
+            list-style: none;
+            margin-bottom: 3rem;
+            text-align: center;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .api-features-list li {
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(110, 69, 226, 0.1);
+            padding: 8px 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(110, 69, 226, 0.4);
+        }
+
+        .api-features-list li i {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .large-cta {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background-color: #1a1a2e;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 2rem 5%;
+            border-top: 1px solid rgba(110, 69, 226, 0.1);
+            font-size: 0.9rem;
+        }
+
+        /* --- MEDIA QUERIES --- */
+        @media (max-width: 900px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            .hero p {
+                font-size: 1.2rem;
+            }
+            .nav-links {
+                display: none;
+            }
+            .steps-container::before {
+                display: none;
+            }
+            .step-card {
+                margin-bottom: 2rem;
+            }
+            .cost {
+                font-size: 3.5rem;
+            }
+            .unit {
+                font-size: 1.2rem;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div class="data-flow-background"></div>
+
+    <nav>
+        <div class="logo">VERA</div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#gallery">Gallery</a>
+            <a href="#api-pricing">API & Pricing</a>
+        </div>
+        <a href="/dashboard">
+        <button class="cta-button">Integrate Now</button>
+        </a>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>The Future of E-commerce: <br> <span>AI Virtual Try-On</span></h1> 
+            <p>Reduce returns and boost conversion by letting your customers see the fit instantly.</p>
+            <a href="/dashboard">
+            <button class="cta-button large-cta">Request API Key</button>
+            </a>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <div class="section-header fade-up">
+                <h2>Why Choose <span>VERA</span>?</h2>
+                <p>Unmatched realism, speed, and scalability for your online store.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-up">
+                    <i class="fas fa-magic"></i>
+                    <h3>Photorealistic Output</h3>
+                    <p>Advanced generative AI that perfectly integrates clothing texture, shadows, and drapes onto the model.</p>
+                </div>
+                <div class="feature-card fade-up">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h3>Lightning Fast API</h3>
+                    <p>Real-time try-on generation. Keep your e-commerce load speeds high and customers happy.</p>
+                </div>
+                <div class="feature-card fade-up">
+                    <i class="fas fa-lock"></i>
+                    <h3>Secure & Scalable</h3>
+                    <p>Built on enterprise infrastructure to handle millions of requests during peak shopping seasons.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header fade-up">
+                <h2>Simple <span>Integration</span> Process</h2>
+                <p>From photo to photorealistic fit in seconds.</p>
+            </div>
+
+            <div class="steps-container">
+                <div class="step-card fade-up">
+                    <div class="step-number">1</div>
+                    <h3>API Call</h3>
+                    <p>Send a product image URL and body type parameters via our simple REST API.</p>
+                </div>
+
+                <div class="step-card fade-up">
+                    <div class="step-number">2</div>
+                    <h3>VERA Generates</h3>
+                    <p>Our cloud AI processes the request, fitting the garment onto the virtual model.</p>
+                </div>
+
+                <div class="step-card fade-up">
+                    <div class="step-number">3</div>
+                    <h3>Display Result</h3>
+                    <p>Receive the generated try-on image URL and display it instantly to your customer.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery" class="gallery">
+        <div class="container">
+            <div class="section-header fade-up">
+                <h2>See the <span>Realism</span></h2>
+                <p>A sample of try-on results created by VERA's engine.</p>
+            </div>
+
+            <div class="gallery-grid">
+                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/6e45e2/ffffff?text=TryOn+1" alt="Virtual Try On Example"></div>
+                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/b06ab3/ffffff?text=TryOn+2" alt="Virtual Try On Example"></div>
+                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/6e45e2/ffffff?text=TryOn+3" alt="Virtual Try On Example"></div>
+                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/b06ab3/ffffff?text=TryOn+4" alt="Virtual Try On Example"></div>
+                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/6e45e2/ffffff?text=TryOn+5" alt="Virtual Try On Example"></div>
+                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/b06ab3/ffffff?text=TryOn+6" alt="Virtual Try On Example"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="api-pricing" class="api-pricing">
+        <div class="container">
+            <div class="section-header fade-up">
+                <h2>Scalable <span>API Pricing</span></h2>
+                <p>Built exclusively for E-commerce. Integrate VERA directly into your product pages.</p>
+            </div>
+
+            <div class="api-card fade-up">
+                <h3>Pay-As-You-Grow Model</h3>
+                <div class="price-model">
+                    <span class="cost">$0.10</span> 
+                    <span class="unit">USD per virtual try-on</span>
+                </div>
+                <p class="subtext">Only pay for what your customers use. No setup fees, no monthly subscriptions, no hidden costs.</p>
+                <ul class="api-features-list">
+                    <li><i class="fas fa-microchip"></i> High-speed API Access</li>
+                    <li><i class="fas fa-chart-line"></i> Real-time Analytics Dashboard</li>
+                    <li><i class="fas fa-shield-alt"></i> Dedicated Technical Support</li>
+                    <li><i class="fas fa-tools"></i> Developer Sandbox Included</li>
+                </ul>
+                <button class="cta-button large-cta">Integrate VERA Now</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 VERA. All rights reserved. | The future of virtual commerce is here.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <script>
+        // Register ScrollTrigger plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // *** FIX: Use gsap.set() to ensure elements start hidden, overriding all CSS rules ***
+        gsap.set(".hero h1, .hero p, .hero button", { opacity: 0, visibility: 'visible' });
+
+        // --- HERO ENTRANCE TIMELINE ---
+        const heroTl = gsap.timeline({ defaults: { duration: 1, ease: "power4.out" } });
+
+        heroTl.to(".hero h1", { opacity: 1, y: 0, duration: 1.5 }, 0.2) // H1 appears first (animates TO opacity 1, y 0)
+              .to(".hero p", { opacity: 1, y: 0 }, "<0.4")             // P appears shortly after H1
+              .to(".hero button", { opacity: 1, scale: 1 }, "<0.4");  // Button scales in shortly after P
+
+        // --- SCROLL ANIMATION (FOR SECTIONS BELOW HERO) ---
+        gsap.utils.toArray('.fade-up').forEach(element => {
+            gsap.from(element, {
+                y: 50,
+                opacity: 0,
+                duration: 1.2,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: element,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none',
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+flask
+flask-wtf
+wtforms
+flask-login
+flask-sqlalchemy
+sqlalchemy
+runware
+google-genai
+werkzeug
+dotenv
+functools
+email-validator
