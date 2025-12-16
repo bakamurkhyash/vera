@@ -1,6 +1,6 @@
 from flask import Flask, redirect, render_template, json, jsonify, sessions, url_for, session, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, LoginManager, login_required
+from flask_login import login_user, LoginManager, login_required, current_user
 from forms import LoginForm, SignupForm
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
@@ -25,7 +25,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'sqlite:///vera_dashboard.db' # Default to SQLite for easy setup
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "r62K`ERW4n5dpybz<()eR~](&uQ=f)`yjtFXwNET{>8R?7GQXKtKG$<)Mt>h$$6")
+app.secret_key = os.environ.get("r62K`ERW4n5dpybz<()eR~](&uQ=f)`yjtFXwNET{>8R?7GQXKtKG$<)Mt>h$$6")
 app.config["SECRET_KEY"] = "r62K`ERW4n5dpybz<()eR~](&uQ=f)`yjtFXwNET{>8R?7GQXKtKG$<)Mt>h$$6"
 
 db.init_app(app)
@@ -89,7 +89,7 @@ def login():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template("dashboard.html", user = current_user)
 
 
 if __name__ == "__main__":
