@@ -164,6 +164,7 @@
 
         .hero h1 span {
             background: linear-gradient(45deg, var(--primary), var(--accent));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -463,6 +464,166 @@
                 font-size: 1.2rem;
             }
         }
+        /* --- Gallery Section Styles --- */
+.gallery {
+    padding: 8rem 5%;
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 5rem;
+}
+
+.section-header h2 {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    margin-bottom: 1rem;
+}
+
+.section-header h2 span {
+    background: linear-gradient(90deg, var(--secondary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color:#6e45e2;
+}
+
+.gallery-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+}
+
+.gallery-card {
+    background: rgba(26, 26, 46, 0.4);
+    border-radius: 30px;
+    padding: 2.5rem;
+    border: 1px solid rgba(110, 69, 226, 0.2);
+    backdrop-filter: blur(15px);
+    position: relative;
+    transition: var(--transition);
+}
+
+.gallery-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.gallery-label {
+    position: absolute;
+    top: -15px;
+    left: 40px;
+    background: var(--primary);
+    padding: 6px 20px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(110, 69, 226, 0.4);
+}
+
+.tryon-process {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex: 1.5;
+}
+
+.img-box {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 3/4;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+}
+
+.gallery-card:hover .img-box img {
+    transform: scale(1.08);
+}
+
+.input-label {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(18, 18, 24, 0.8);
+    backdrop-filter: blur(5px);
+    padding: 5px 15px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    color: var(--light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.process-icon {
+    font-size: 1.5rem;
+    color: var(--primary);
+    opacity: 0.6;
+}
+
+.main-arrow {
+    font-size: 2.5rem;
+    animation: arrowMove 2s infinite ease-in-out;
+}
+
+@keyframes arrowMove {
+    0%, 100% { transform: translateX(0); opacity: 0.4; }
+    50% { transform: translateX(10px); opacity: 1; }
+}
+
+.result-item {
+    flex: 1;
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 30px rgba(110, 69, 226, 0.2);
+}
+
+.vera-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--accent);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 5px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 968px) {
+    .tryon-process {
+        flex-direction: column;
+    }
+    .main-arrow {
+        transform: rotate(90deg);
+    }
+    @keyframes arrowMove {
+        0%, 100% { transform: translateY(0) rotate(90deg); }
+        50% { transform: translateY(10px) rotate(90deg); }
+    }
+    .input-group {
+        width: 100%;
+    }
+}
+
+
         
     </style>
 </head>
@@ -495,22 +656,22 @@
 
     <section class="features">
         <div class="container">
-            <div class="section-header fade-up">
+            <div class="section-header  ">
                 <h2>Why Choose <span>VERA</span>?</h2>
                 <p>Unmatched realism, speed, and scalability for your online store.</p>
             </div>
             <div class="features-grid">
-                <div class="feature-card fade-up">
+                <div class="feature-card  ">
                     <i class="fas fa-magic"></i>
                     <h3>Photorealistic Output</h3>
                     <p>Advanced generative AI that perfectly integrates clothing texture, shadows, and drapes onto the model.</p>
                 </div>
-                <div class="feature-card fade-up">
+                <div class="feature-card  ">
                     <i class="fas fa-tachometer-alt"></i>
                     <h3>Lightning Fast API</h3>
                     <p>Real-time try-on generation. Keep your e-commerce load speeds high and customers happy.</p>
                 </div>
-                <div class="feature-card fade-up">
+                <div class="feature-card  ">
                     <i class="fas fa-lock"></i>
                     <h3>Secure & Scalable</h3>
                     <p>Built on enterprise infrastructure to handle millions of requests during peak shopping seasons.</p>
@@ -521,25 +682,25 @@
 
     <section id="how-it-works" class="how-it-works">
         <div class="container">
-            <div class="section-header fade-up">
+            <div class="section-header  ">
                 <h2>Simple <span>Integration</span> Process</h2>
                 <p>From photo to photorealistic fit in seconds.</p>
             </div>
 
             <div class="steps-container">
-                <div class="step-card fade-up">
+                <div class="step-card  ">
                     <div class="step-number">1</div>
                     <h3>API Call</h3>
                     <p>Send a product image URL and body type parameters via our simple REST API.</p>
                 </div>
 
-                <div class="step-card fade-up">
+                <div class="step-card  ">
                     <div class="step-number">2</div>
                     <h3>VERA Generates</h3>
                     <p>Our cloud AI processes the request, fitting the garment onto the virtual model.</p>
                 </div>
 
-                <div class="step-card fade-up">
+                <div class="step-card  ">
                     <div class="step-number">3</div>
                     <h3>Display Result</h3>
                     <p>Receive the generated try-on image URL and display it instantly to your customer.</p>
@@ -548,32 +709,73 @@
         </div>
     </section>
 
-    <section id="gallery" class="gallery">
-        <div class="container">
-            <div class="section-header fade-up">
-                <h2>See the <span>Realism</span></h2>
-                <p>A sample of try-on results created by VERA's engine.</p>
-            </div>
+<section class="gallery" id="gallery">
+    <div class="section-header  ">
+        <h2>The <span>Magic</span> In Action</h2>
+        <p>Witness how VERA's neural engine blends person and product with millimeter precision.</p>
+    </div>
 
-            <div class="gallery-grid">
-                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/6e45e2/ffffff?text=TryOn+1" alt="Virtual Try On Example"></div>
-                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/b06ab3/ffffff?text=TryOn+2" alt="Virtual Try On Example"></div>
-                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/6e45e2/ffffff?text=TryOn+3" alt="Virtual Try On Example"></div>
-                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/b06ab3/ffffff?text=TryOn+4" alt="Virtual Try On Example"></div>
-                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/6e45e2/ffffff?text=TryOn+5" alt="Virtual Try On Example"></div>
-                <div class="gallery-item fade-up"><img src="https://via.placeholder.com/400x500/b06ab3/ffffff?text=TryOn+6" alt="Virtual Try On Example"></div>
+    <div class="gallery-grid">
+        
+        <div class="gallery-card  ">
+            <span class="gallery-label">Male</span>
+            <div class="tryon-process">
+                <div class="input-group">
+                    <div class="img-box input-item">
+                        <img src="https://res.cloudinary.com/dtnlwsye7/image/upload/v1765271316/person1_l3a5aw.webp" alt="User">
+                        <span class="input-label">User</span>
+                    </div>
+                    <div class="process-icon"><i class="fas fa-plus"></i></div>
+                    <div class="img-box input-item">
+                        <img src="https://res.cloudinary.com/dtnlwsye7/image/upload/v1765271341/clothing1_e70jgp.webp" alt="Product">
+                        <span class="input-label">Item</span>
+                    </div>
+                </div>
+
+                <div class="process-icon main-arrow"><i class="fas fa-chevron-right"></i></div>
+
+                <div class="img-box result-item">
+                    <img src="https://res.cloudinary.com/dtnlwsye7/image/upload/v1765271316/tryon1_biccyo.jpg" alt="AI Result">
+                    <div class="vera-badge">VERA AI GENERATED</div>
+                </div>
             </div>
         </div>
-    </section>
+
+        <div class="gallery-card  ">
+            <span class="gallery-label">Female</span>
+            <div class="tryon-process">
+                <div class="input-group">
+                    <div class="img-box input-item">
+                        <img src="https://res.cloudinary.com/dtnlwsye7/image/upload/v1765271316/perosn2_bysxs8.avif" alt="User">
+                        <span class="input-label">User</span>
+                    </div>
+                    <div class="process-icon"><i class="fas fa-plus"></i></div>
+                    <div class="img-box input-item">
+                        <img src="https://res.cloudinary.com/dtnlwsye7/image/upload/v1765271316/clothing2_mwg29a.png" alt="Product">
+                        <span class="input-label">Item</span>
+                    </div>
+                </div>
+
+                <div class="process-icon main-arrow"><i class="fas fa-chevron-right"></i></div>
+
+                <div class="img-box result-item">
+                    <img src="https://res.cloudinary.com/dtnlwsye7/image/upload/a_-90/a_90/c_crop,ar_1:1/v1765271316/tryon2_tlc221.jpg" alt="AI Result">
+                    <div class="vera-badge">VERA AI GENERATED</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
 
     <section id="api-pricing" class="api-pricing">
         <div class="container">
-            <div class="section-header fade-up">
-                <h2>Scalable <span>API Pricing</span></h2>
+            <div class="section-header  ">
+                <h2>Scalable <span>API</span> Pricing</h2>
                 <p>Built exclusively for E-commerce. Integrate VERA directly into your product pages.</p>
             </div>
 
-            <div class="api-card fade-up">
+            <div class="api-card  ">
                 <h3>Pay-As-You-Grow Model</h3>
                 <div class="price-model">
                     <span class="cost">$0.10</span> 
@@ -614,7 +816,7 @@
               .to(".hero button", { opacity: 1, scale: 1 }, "<0.4");  // Button scales in shortly after P
 
         // --- SCROLL ANIMATION (FOR SECTIONS BELOW HERO) ---
-        gsap.utils.toArray('.fade-up').forEach(element => {
+        gsap.utils.toArray('. ').forEach(element => {
             gsap.from(element, {
                 y: 50,
                 opacity: 0,
