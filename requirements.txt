@@ -10,3 +10,4 @@ google-genai
 werkzeug
 dotenv
 email-validator
+authlib
