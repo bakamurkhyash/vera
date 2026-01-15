@@ -70,11 +70,14 @@ def home():
 
 @app.route("/login/google")
 def login_google():
-    app_url = get_app_url()
-    return auth0.authorize_redirect(
-        redirect_uri=f"{app_url}/callback",
-        connection="google-oauth2" 
-    )
+    try:
+        app_url = get_app_url()
+        return auth0.authorize_redirect(
+            redirect_uri=f"{app_url}/callback",
+            connection="google-oauth2" 
+        )
+    except Exception as ex:
+        return {"error":ex}
 
 
 @app.route('/login', methods=['GET', 'POST'])
