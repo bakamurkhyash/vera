@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 import dotenv
 import string
 import secrets
+import psycopg2
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 from urllib.parse import urlencode
@@ -29,7 +30,7 @@ def load_user(user_id):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 
-    'sqlite:///vera_dashboard.db' # Default to SQLite for easy setup
+    'postgresql://postgres:ryoiki_tenkai__nehan_no_roka@db.ivajdrrrjktuarovumbd.supabase.co:5432/postgres' # Default to SQLite for easy setup
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.environ.get("r62K`ERW4n5dpybz<()eR~](&uQ=f)`yjtFXwNET{>8R?7GQXKtKG$<)Mt>h$$6")
@@ -52,17 +53,17 @@ db.init_app(app)
 
 '''@app.cli.command('init-db')
 def init_db():
-    db.init_app(app)
+    #db.init_app(app)
     """Create all database tables."""
     with app.app_context():
         # Drop all tables and then create them (DANGEROUS: use for development only)
         # db.drop_all() 
         db.create_all()
-        print("Database tables created!")''' #only activate while pushing in production
+        print("Database tables created!")'''
 
 
 def get_app_url():
-    return os.environ.get("APP_URL", request.url_root.rstrip("/"))
+    return os.environ.get("APP_URL", "https://vera-jf5t.onrender.com")
 
 @app.route("/")
 def home():
