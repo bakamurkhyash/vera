@@ -17,6 +17,12 @@ from functools import wraps
 
 load_dotenv()
 
+AUTH0_CLIENT_ID = "fl8SAQwImvtEaHs4068LfYpI2hfNAHTK"
+AUTH0_DOMAIN = "dev-2cippwjdymebmpv1.us.auth0.com"
+AUTH0_CLIENT_SECRET  = "lSkleCikoqhFXkliEHZsg6K9FebUIVFTDKz4gKnh6ReehwBlaRe0K2IxkaQt_CkR"
+AUTH0_CALLBACK_URL="https://vera-jf5t.onrender.com/callback"
+APP_URL = "https://vera-jf5t.onrender.com"
+
 app = Flask(__name__)
 
 login_manager = LoginManager(app)
@@ -37,7 +43,7 @@ app.secret_key = os.environ.get("r62K`ERW4n5dpybz<()eR~](&uQ=f)`yjtFXwNET{>8R?7G
 app.config["SECRET_KEY"] = "r62K`ERW4n5dpybz<()eR~](&uQ=f)`yjtFXwNET{>8R?7GQXKtKG$<)Mt>h$$6"
 
 oauth = OAuth(app)
-auth0 = oauth.register(
+'''auth0 = oauth.register(
     "auth0",
     client_id=os.environ.get("AUTH0_CLIENT_ID"),
     client_secret=os.environ.get("AUTH0_CLIENT_SECRET"),
@@ -46,6 +52,17 @@ auth0 = oauth.register(
     authorize_url=f"https://{os.environ.get('AUTH0_DOMAIN')}/authorize",
     client_kwargs={"scope": "openid profile email"},
     server_metadata_url=f"https://{os.environ.get('AUTH0_DOMAIN')}/.well-known/openid-configuration"
+)'''
+
+auth0 = oauth.register(
+    "VERA",
+    client_id=AUTH0_CLIENT_ID,
+    client_secret=AUTH0_CLIENT_SECRET,
+    api_base_url=f"https://{AUTH0_DOMAIN}",
+    access_token_url=f"https://{AUTH0_DOMAIN}/oauth/token",
+    authorize_url=f"https://{AUTH0_DOMAIN}/authorize",
+    client_kwargs={"scope": "openid profile email"},
+    server_metadata_url=f"https://{AUTH0_DOMAIN}/.well-known/openid-configuration"
 )
 
 
