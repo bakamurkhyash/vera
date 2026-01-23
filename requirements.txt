@@ -11,3 +11,5 @@ werkzeug
 dotenv
 email-validator
 authlib
+psycopg2
+psycopg2-binary
