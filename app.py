@@ -1,6 +1,7 @@
 from flask import Flask, redirect, render_template, json, jsonify, sessions, url_for, session, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, LoginManager, login_required, current_user, logout_user
+from flask_migrate import Migrate
 from forms import LoginForm, SignupForm
 from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
@@ -24,6 +25,8 @@ AUTH0_CALLBACK_URL="https://vera-jf5t.onrender.com/callback"
 APP_URL = "https://vera-jf5t.onrender.com"
 
 app = Flask(__name__)
+
+migrate = Migrate(app, db)
 
 login_manager = LoginManager(app)
 

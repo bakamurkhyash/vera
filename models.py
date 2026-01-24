@@ -51,7 +51,7 @@ class APIKey(db.Model, UserMixin):
     
     # Key details
     api_key_hash = db.Column(db.String(255), unique=True, nullable=False) # Store SHA-256 hash
-    key_prefix = db.Column(db.String(16), unique=True, nullable=False)
+    key_prefix = db.Column(db.String(50), unique=True, nullable=False)
     is_active = db.Column(db.Boolean, default=True, nullable=False)
     
     # Metadata
