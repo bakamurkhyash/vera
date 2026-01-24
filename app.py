@@ -86,7 +86,7 @@ def get_app_url():
 def home():
     return render_template("index.html")
 
-@app.route("/login/google")
+@app.route("/login_google")
 def login_google():
     try:
         app_url = get_app_url()
@@ -173,26 +173,35 @@ def create_api_key():
 @app.route("/callback")
 def callback():
     try:
+        # 1. Exchange the code for the token
         token = auth0.authorize_access_token()
-        resp = auth0.get("userinfo")
-        userinfo = resp.json()
+        
+        # 2. Get user info directly from the token (saves a network call)
+        userinfo = token.get("userinfo")
+        if not userinfo:
+            # Fallback if userinfo isn't in the token
+            userinfo = auth0.get("userinfo").json()
+
         aui = userinfo["sub"]
-        email = userinfo("email", "")
+        email = userinfo.get("email", "")
         name = userinfo.get("name", "")
-        user_exists = Developer.query.filter_by(auth0_user_id = aui).first()
-        if user_exists:
-            login_user(user_exists, remember=True)
-            return redirect(url_for("dashboard"))
-        else:
-            new_user = Developer(
-                    name = name,
-                    email = email,
-                    auth0_user_id = aui
-                )
-            db.session.add(new_user)
+
+        # 3. DB Logic
+        user = Developer.query.filter_by(auth0_user_id=aui).first()
+        
+        if not user:
+            user = Developer(
+                name=name,
+                email=email,
+                auth0_user_id=aui
+            )
+            db.session.add(user)
             db.session.commit()
-            login_user(new_user, remember=True)
-            return redirect(url_for("dashboard"))
+
+        # 4. Flask-Login session creation
+        login_user(user, remember=True)
+        return redirect(url_for("dashboard"))
+
     except Exception as e:
         app.logger.error(f"Login callback error: {e}")
         flash("Login failed. Please try again.", "danger")
