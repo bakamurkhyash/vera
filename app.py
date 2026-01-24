@@ -36,7 +36,8 @@ def load_user(user_id):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 
-    'postgresql://postgres:ryoiki_tenkai__nehan_no_roka@db.ivajdrrrjktuarovumbd.supabase.co:5432/postgres' # Default to SQLite for easy setup
+    #'postgresql://postgres:ryoiki_tenkai__nehan_no_roka@db.ivajdrrrjktuarovumbd.supabase.co:5432/postgres',
+    'postgresql://postgres.ivajdrrrjktuarovumbd:ryoiki_tenkai__nehan_no_roka@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres' # Default to SQLite for easy setup
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = os.environ.get("r62K`ERW4n5dpybz<()eR~](&uQ=f)`yjtFXwNET{>8R?7GQXKtKG$<)Mt>h$$6")
