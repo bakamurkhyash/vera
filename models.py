@@ -59,6 +59,7 @@ class APIKey(db.Model, UserMixin):
 
     def __repr__(self):
         return f"<APIKey {self.key_prefix} active:{self.is_active}>"
+    
     def get_id(self):
         return str(self.key_id)
 
@@ -80,6 +81,32 @@ class UsageLog(db.Model, UserMixin):
     latency_ms = db.Column(db.Integer)
     status_code = db.Column(db.Integer, nullable=False)
     
+    # Metadata
+    requested_at = db.Column(db.DateTime(timezone=True), default=func.now(), nullable=False)
+
+    def __repr__(self):
+        return f"<UsageLog {self.endpoint} @ {self.requested_at}>"
+    
+    def get_id(self):
+        return str(self.log_id)
+    
+
+#Table for Requests recieved on FAPI
+class RequestLog(db.Model, UserMixin):
+    """
+    Records every API request  and stores the source to return the result to the accurate user.
+    """
+    __tablename__ = 'request_logs'
+
+    # Primary Key
+    req_id = db.Column(db.Integer, primary_key=True)
+    
+    # Log Details
+    endpoint = db.Column(db.String(100), nullable=False)
+    status_code = db.Column(db.Integer, nullable=False)
+    req_source = db.Column(db.String(100), nullable=False)
+    task_id = db.Column(db.String(100), nullable=False)
+    record_id = db.Column(db.String(100), nullable=False)
     # Metadata
     requested_at = db.Column(db.DateTime(timezone=True), default=func.now(), nullable=False)
 
