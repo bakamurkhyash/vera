@@ -134,7 +134,7 @@ def login():
 
                 return redirect(url_for("login"))
         
-        # Fall through if validation fails for either submitted form
+       
 
     return render_template('login.html', 
                            login_form=login_form, 
@@ -177,13 +177,13 @@ def create_api_key():
 @app.route("/callback")
 def callback():
     try:
-        # 1. Exchange the code for the token
+  
         token = auth0.authorize_access_token()
         
-        # 2. Get user info directly from the token (saves a network call)
+
         userinfo = token.get("userinfo")
         if not userinfo:
-            # Fallback if userinfo isn't in the token
+           
             userinfo = auth0.get("userinfo").json()
 
         aui = userinfo["sub"]
