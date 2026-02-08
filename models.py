@@ -104,14 +104,13 @@ class RequestLog(db.Model, UserMixin):
     # Log Details
     endpoint = db.Column(db.String(100), nullable=False)
     status_code = db.Column(db.Integer, nullable=False)
-    req_source = db.Column(db.String(100), nullable=False)
     task_id = db.Column(db.String(100), nullable=False)
-    record_id = db.Column(db.String(100), nullable=False)
+    callbackurl = db.Column(db.String(200), nullable=False)
     # Metadata
     requested_at = db.Column(db.DateTime(timezone=True), default=func.now(), nullable=False)
 
     def __repr__(self):
-        return f"<UsageLog {self.endpoint} @ {self.requested_at}>"
+        return f"<RequestLog {self.endpoint} @ {self.requested_at}>"
     
     def get_id(self):
         return str(self.log_id)
