@@ -158,34 +158,35 @@ def logout():
 
 @app.route("/api_key", methods=["POST"])
 def create_api_key():
-    key_exists = APIKey.query.filter_by(developer_id = current_user.developer_id, is_active = True).first()
-    if key_exists:
-        key_exists.is_active = False
-    key = secrets.token_urlsafe(32)
+    APIKey.query.filter_by(developer_id=current_user.developer_id, is_active=True).update({"is_active": False})
+    while True:
+        prefix = ''.join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(7))
+        if not APIKey.query.filter_by(key_prefix=prefix).first():
+            break
+
+    secret = secrets.token_urlsafe(32)
     new_apikey = APIKey(
-        developer_id = current_user.developer_id,
-        api_key_hash = generate_password_hash(key),
-        key_prefix = secrets.token_urlsafe(16)
+        developer_id=current_user.developer_id,
+        api_key_hash=generate_password_hash(secret), 
+        key_prefix=prefix,
+        is_active=True
     )
     db.session.add(new_apikey)
-
     db.session.commit()
+
+    full_key = f"vera_{prefix}_{secret}"
     return jsonify({
-        "api_key":key
+        "api_key": full_key,
+        "note": "Copy this now. You won't be able to see it again!"
     })
 
 @app.route("/callback")
 def callback():
     try:
-  
         token = auth0.authorize_access_token()
-        
-
         userinfo = token.get("userinfo")
         if not userinfo:
-           
             userinfo = auth0.get("userinfo").json()
-
         aui = userinfo["sub"]
         email = userinfo.get("email", "")
         name = userinfo.get("name", "")
