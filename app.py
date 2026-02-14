@@ -15,6 +15,9 @@ from urllib.parse import urlencode
 from models import db, APIKey, UsageLog, Developer
 import os
 from functools import wraps
+from sqlalchemy import func
+from datetime import datetime, timedelta
+
 
 load_dotenv()
 
@@ -31,6 +34,13 @@ migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 
 login_manager.login_view = 'login'
+
+class DisplayLog:
+    def __init__(self,t:int,l:int,s:float):
+        self.total_tryons = t
+        self.average_latency = l
+        self.success_rate = s
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -134,17 +144,51 @@ def login():
 
                 return redirect(url_for("login"))
         
-       
-
     return render_template('login.html', 
                            login_form=login_form, 
                            signup_form=signup_form)
     
-
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html", user = current_user)
+    log = UsageLog.query.filter_by(developer_id = current_user.developer_id).all()
+    displaylog = DisplayLog(len(log), sum(x for x in log)/len(log) if not len(log)<1 else 0, 0 if len(log)<1 else 100)
+    return render_template("dashboard.html", user = current_user, log = displaylog)
+
+
+@app.route('/api/analytics')
+def get_analytics():
+    period = request.args.get('period', 'week')
+    now = datetime.now(datetime.timezone.utc)
+    
+    #Define time filters and grouping based on the period
+    if period == 'day':
+        start_date = now - timedelta(days=1)
+        group_by_format = func.strftime('%H:00', UsageLog.requested_at)
+    elif period == 'month':
+        start_date = now - timedelta(days=30)
+        group_by_format = func.strftime('%Y-%m-%d', UsageLog.requested_at)
+    elif period == 'year':
+        start_date = now - timedelta(days=365)
+        group_by_format = func.strftime('%Y-%m', UsageLog.requested_at)
+    else: 
+        start_date = now - timedelta(days=7)
+        group_by_format = func.strftime('%a', UsageLog.requested_at)
+
+    results = db.session.query(
+        group_by_format.label('time_label'),
+        func.count(UsageLog.log_id).label('request_count')
+    ).filter(
+        UsageLog.requested_at >= start_date,
+        UsageLog.developer_id == current_user.developer_id
+    ).group_by('time_label').order_by(UsageLog.requested_at).all()
+
+    data = {
+        "labels": [row[0] for row in results],
+        "values": [row[1] for row in results]
+    }
+
+    return jsonify(data)
 
 @app.route("/profile")
 @login_required
